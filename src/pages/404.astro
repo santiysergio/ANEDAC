@@ -1,0 +1,10 @@
+---
+import BaseLayout from '@/layouts/BaseLayout'
+import TitlePage from '@/components/TitlePage'
+import { getTags } from '@/utils'
+const tags = await getTags()
+---
+
+<BaseLayout title='404'>
+	<img src='https://midu.dev/images/this-is-fine-404.gif' alt='This is fine' class='w-full' />
+</BaseLayout>
