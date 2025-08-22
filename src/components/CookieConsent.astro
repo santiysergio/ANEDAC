@@ -1,0 +1,170 @@
+---
+// src/components/CookieConsent.astro
+// No se necesita código de servidor (frontmatter) para este componente.
+---
+
+<!-- 1. ESTRUCTURA HTML DEL BANNER -->
+<div id='cookie-consent-banner' class='cookie-consent-banner'>
+	<p>
+		Utilizamos cookies para mejorar tu experiencia en nuestro sitio web. Al continuar, aceptas
+		nuestro uso de cookies.
+		<a href='/post/poltica-de-cookies/'>Más información</a>.
+	</p>
+	<div class='cookie-consent-buttons'>
+		<button id='accept-cookies' class='cookie-btn'>Aceptar</button>
+		<button id='reject-cookies' class='cookie-btn cookie-btn-reject'>Rechazar</button>
+	</div>
+</div>
+
+<!-- 2. ESTILOS CSS (Astro los aísla automáticamente a este componente) -->
+<style>
+	.cookie-consent-banner {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		background-color: #2c3e50;
+		color: #ecf0f1;
+		padding: 20px;
+		box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		z-index: 1000;
+		transition: transform 0.4s ease-out;
+		transform: translateY(100%); /* Inicia oculto */
+	}
+
+	.cookie-consent-banner.show {
+		transform: translateY(0); /* Se muestra deslizándose */
+	}
+
+	.cookie-consent-banner p {
+		margin: 0;
+		font-size: 14px;
+		flex-grow: 1;
+	}
+
+	.cookie-consent-banner a {
+		color: #3498db;
+		text-decoration: underline;
+	}
+
+	.cookie-consent-buttons {
+		display: flex;
+		gap: 10px;
+		margin-left: 20px;
+	}
+
+	.cookie-btn {
+		padding: 10px 20px;
+		border: none;
+		border-radius: 5px;
+		cursor: pointer;
+		font-weight: bold;
+		transition: background-color 0.2s;
+	}
+
+	#accept-cookies {
+		background-color: #27ae60;
+		color: white;
+	}
+	#accept-cookies:hover {
+		background-color: #2ecc71;
+	}
+	.cookie-btn-reject {
+		background-color: #7f8c8d;
+		color: white;
+	}
+	.cookie-btn-reject:hover {
+		background-color: #95a5a6;
+	}
+
+	@media (max-width: 768px) {
+		.cookie-consent-banner {
+			flex-direction: column;
+			text-align: center;
+		}
+		.cookie-consent-buttons {
+			margin-left: 0;
+			margin-top: 15px;
+			width: 100%;
+			justify-content: center;
+		}
+	}
+</style>
+
+<!-- 3. LÓGICA JAVASCRIPT (se ejecutará en el navegador del cliente) -->
+<script>
+	// --- INICIO DE LA SOLUCIÓN ---
+	// Le decimos a TypeScript que confíe en que estas propiedades y funciones existirán globalmente.
+	declare global {
+		interface Window {
+			dataLayer: any[]
+		}
+		function gtag(...args: any[]): void
+	}
+	// --- FIN DE LA SOLUCIÓN ---
+
+	// Función para cargar los scripts de seguimiento
+	function activateTracking() {
+		const gaId = 'G-L3RENW6576' // Tu ID real
+
+		if (document.querySelector(`script[src*="${gaId}"]`)) {
+			console.log('Google Analytics ya está cargado.')
+			return
+		}
+
+		const script = document.createElement('script')
+		script.async = true
+		script.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`
+
+		document.head.appendChild(script)
+
+		// Ahora TypeScript ya sabe qué es window.dataLayer y no dará error
+		window.dataLayer = window.dataLayer || []
+
+		// Ahora TypeScript ya sabe qué es la función gtag y no dará error
+		function gtag(...args: any[]) {
+			// Le damos el tipo aquí también por consistencia
+			window.dataLayer.push(arguments)
+		}
+		gtag('js', new Date())
+
+		gtag('config', gaId)
+
+		console.log(`Google Analytics activado para el ID: ${gaId}`)
+	}
+
+	// --- El resto del código del banner (no cambia) ---
+	const banner = document.getElementById('cookie-consent-banner')
+	const acceptBtn = document.getElementById('accept-cookies')
+	const rejectBtn = document.getElementById('reject-cookies')
+
+	if (banner && acceptBtn && rejectBtn) {
+		const hideBanner = () => {
+			banner.classList.remove('show')
+		}
+
+		const consent = localStorage.getItem('cookie_consent')
+
+		if (consent === 'accepted') {
+			activateTracking()
+		} else if (!consent) {
+			setTimeout(() => {
+				banner.classList.add('show')
+			}, 300)
+		}
+
+		acceptBtn.addEventListener('click', () => {
+			localStorage.setItem('cookie_consent', 'accepted')
+			hideBanner()
+			activateTracking()
+		})
+
+		rejectBtn.addEventListener('click', () => {
+			localStorage.setItem('cookie_consent', 'rejected')
+			hideBanner()
+		})
+	}
+</script>

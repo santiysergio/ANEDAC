@@ -1,7 +1,11 @@
 ---
+// src/layouts/BaseLayout.astro
+
+// Importación SIN la extensión .astro, como solicitaste
+import CookieConsent from '@/components/CookieConsent'
+
 import BaseHead from '@/components/BaseHead'
 import Header from '@/components/Header'
-import Footer from '@/components/Footer'
 import ProviderTheme from '@/components/ProviderTheme'
 import ProviderAnimations from '@/components/ProviderAnimations'
 import TwSizeIndicator from '@/components/TwSizeIndicator'
@@ -23,10 +27,41 @@ const { title, description, image, articleDate } = Astro.props
 		>
 			<Header />
 			<slot />
-			<Footer />
 		</main>
 		<TwSizeIndicator />
 		<EditBlog />
+
+		<footer class='text-center py-8 text-sm text-gray-500'>
+			<div class='mt-2'>
+				<a
+					href='#'
+					id='manage-cookies-btn'
+					class='underline hover:text-gray-800 dark:hover:text-gray-200'
+				>
+					Gestionar Preferencias de Cookies
+				</a>
+			</div>
+		</footer>
+
+		<CookieConsent client:load />
+
+		<script>
+			const manageCookiesBtn = document.getElementById('manage-cookies-btn')
+
+			if (manageCookiesBtn) {
+				manageCookiesBtn.addEventListener('click', (event) => {
+					event.preventDefault()
+					localStorage.removeItem('cookie_consent')
+					const banner = document.getElementById('cookie-consent-banner')
+					if (banner) {
+						banner.classList.add('show')
+					} else {
+						location.reload()
+					}
+				})
+			}
+		</script>
+
 		<style>
 			body {
 				margin-left: calc(100vw - 100%); /* prevent layout shift */
