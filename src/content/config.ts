@@ -1,22 +1,31 @@
-import { defineCollection, z } from 'astro:content'
-import { CATEGORIES } from '@/data/categories'
+// src/content/config.ts
 
-const blog = defineCollection({
-	// Type-check frontmatter using a schema
-	schema: ({ image }) =>
+import { defineCollection, z } from 'astro:content'
+import { CATEGORIES } from '../data/categories' // Asegúrate de que esta ruta sea correcta
+
+const blogCollection = defineCollection({
+	type: 'content',
+	schema: (
+		{ image } // Usamos 'image' para el helper de imágenes de Astro
+	) =>
 		z.object({
-			title: z.string().max(80),
-			description: z.string(),
-			// Transform string to Date object
-			pubDate: z
-				.string()
-				.or(z.date())
-				.transform((val) => new Date(val)),
-			heroImage: image(),
+			// CAMBIO: Añadimos .optional() para que la imagen no sea obligatoria
+			heroImage: image().optional(),
 			category: z.enum(CATEGORIES),
-			tags: z.array(z.string()),
-			draft: z.boolean().default(false)
+			description: z.string(),
+			pubDate: z.date(),
+			draft: z.boolean().optional(),
+
+			// CAMBIO: Añadimos 'listed' como un booleano opcional.
+			// Lo definimos aquí para que Astro lo reconozca.
+			listed: z.boolean().optional(),
+
+			// CAMBIO: Añadimos .optional() para que las etiquetas no sean obligatorias
+			tags: z.array(z.string()).optional(),
+			title: z.string()
 		})
 })
 
-export const collections = { blog }
+export const collections = {
+	blog: blogCollection // Asegúrate de que el nombre aquí es 'blog' o 'post' según tu proyecto
+}

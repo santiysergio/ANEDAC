@@ -3,10 +3,19 @@ import ListCategories from '@/components/ListCategories'
 import ListPosts from '@/components/ListPosts'
 import TitlePage from '@/components/TitlePage'
 import BaseLayout from '@/layouts/BaseLayout'
-import { getPosts } from '@/utils'
+import { getCollection } from 'astro:content'
 
-const MAX_POSTS = 5 // max number of posts to show on the home page
-const posts = await getPosts(MAX_POSTS)
+const MAX_POSTS = 5
+
+const allFilteredPosts = (await getCollection('blog')).filter(
+	(post) => post.data.listed !== false && !post.data.draft
+)
+
+const sortedPosts = allFilteredPosts.sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+)
+
+const postsToShowOnHome = sortedPosts.slice(0, MAX_POSTS)
 ---
 
 <BaseLayout title='Inicio'>
@@ -15,7 +24,7 @@ const posts = await getPosts(MAX_POSTS)
 
 	<div>
 		<h2 class='text-lg font-medium tracking-wide text-end'>Otros posts</h2>
-		<ListPosts FirstBig={true} posts={posts} />
+		<ListPosts FirstBig={true} posts={postsToShowOnHome} />
 	</div>
 </BaseLayout>
 
@@ -30,7 +39,6 @@ const posts = await getPosts(MAX_POSTS)
 			{
 				duration: 2.5,
 				opacity: { duration: 3 },
-
 				offset: [0, 0.55, 0.75]
 			}
 		)

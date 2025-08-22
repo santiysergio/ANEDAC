@@ -15,10 +15,28 @@ const { title, description, image, articleDate } = Astro.props
 
 <html lang='es' class='scroll-smooth'>
 	<head>
+		{/* ... tu head no cambia ... */}
 		<BaseHead title={title} description={description} ogImage={image} articleDate={articleDate} />
 		<ProviderTheme />
 		<ProviderAnimations />
 		<link rel='icon' href='/favicon.png' type='image/png' />
+
+		{/* ---- Configuración de Consent v2 de Google ---- */}
+		<script async src='https://www.googletagmanager.com/gtag/js?id=G-L3RENW6576'></script>
+		<script is:inline>
+			window.dataLayer = window.dataLayer || []
+			function gtag() {
+				dataLayer.push(arguments)
+			}
+			gtag('js', new Date())
+			gtag('consent', 'default', {
+				ad_storage: 'denied',
+				analytics_storage: 'denied',
+				ad_user_data: 'denied',
+				ad_personalization: 'denied'
+			})
+			gtag('config', 'G-L3RENW6576')
+		</script>
 	</head>
 
 	<body class='bg-white text-stone-950 dark:bg-[#0a0910] dark:text-white'>
@@ -31,7 +49,29 @@ const { title, description, image, articleDate } = Astro.props
 		<TwSizeIndicator />
 		<EditBlog />
 
-		<footer class='text-center py-8 text-sm text-gray-500'>
+		{/* ========================================================== */}
+		{/* ============ INICIO DEL FOOTER ACTUALIZADO =============== */}
+		{/* ========================================================== */}
+		<footer class='text-center py-8 text-sm text-gray-500 dark:text-gray-400'>
+			<!-- DIV PARA LOS ENLACES LEGALES -->
+			<div class='flex justify-center items-center flex-wrap gap-x-6 gap-y-2 mb-4'>
+				<a href='/post/aviso-legal/' class='underline hover:text-gray-800 dark:hover:text-gray-200'
+					>Aviso Legal</a
+				>
+				<a
+					href='/post/politica-de-privacidad/'
+					class='underline hover:text-gray-800 dark:hover:text-gray-200'>Política de Privacidad</a
+				>
+				<a
+					href='/post/poltica-de-cookies/'
+					class='underline hover:text-gray-800 dark:hover:text-gray-200'>Política de Cookies</a
+				>
+			</div>
+
+			<!-- COPYRIGHT -->
+			<p>&copy; {new Date().getFullYear()} ANEDAC. Todos los derechos reservados.</p>
+
+			<!-- GESTIÓN DE COOKIES -->
 			<div class='mt-2'>
 				<a
 					href='#'
@@ -42,12 +82,14 @@ const { title, description, image, articleDate } = Astro.props
 				</a>
 			</div>
 		</footer>
+		{/* ========================================================== */}
+		{/* ============== FIN DEL FOOTER ACTUALIZADO ================ */}
+		{/* ========================================================== */}
 
 		<CookieConsent client:load />
 
 		<script>
 			const manageCookiesBtn = document.getElementById('manage-cookies-btn')
-
 			if (manageCookiesBtn) {
 				manageCookiesBtn.addEventListener('click', (event) => {
 					event.preventDefault()

@@ -14,7 +14,7 @@ type Props = {
 }
 
 const { data, readTime, headings, id } = Astro.props
-const { title, description, pubDate, heroImage, tags } = data
+const { title, description, pubDate, heroImage, tags } = data // 'tags' puede ser undefined aquí
 
 const articleDate = pubDate.toISOString()
 ---
@@ -41,9 +41,24 @@ const articleDate = pubDate.toISOString()
 				</h1>
 			</div>
 
-			<div class='flex flex-wrap justify-center items-center gap-2 gap-y-4 md:gap-5'>
-				{tags.map((tag) => <Tag tag={tag} />)}
-			</div>
+			{/* ========================================================== */}
+			{/* ============== INICIO DE LA SOLUCIÓN ====================== */}
+			{/* ========================================================== */}
+
+			{/* Solo mostramos el div de etiquetas si 'tags' existe y tiene elementos */}
+			{
+				tags && tags.length > 0 && (
+					<div class='flex flex-wrap justify-center items-center gap-2 gap-y-4 md:gap-5'>
+						{tags.map((tag) => (
+							<Tag tag={tag} />
+						))}
+					</div>
+				)
+			}
+
+			{/* ========================================================== */}
+			{/* ================= FIN DE LA SOLUCIÓN ====================== */}
+			{/* ========================================================== */}
 		</header>
 
 		<>
@@ -72,6 +87,7 @@ const articleDate = pubDate.toISOString()
 </BaseLayout>
 
 <script>
+	// Tu script no necesita cambios
 	const fnObserver = () => {
 		function handleIntersection(
 			entries: IntersectionObserverEntry[],

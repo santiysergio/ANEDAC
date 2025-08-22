@@ -94,49 +94,12 @@
 	}
 </style>
 
-<!-- 3. LÓGICA JAVASCRIPT (se ejecutará en el navegador del cliente) -->
 <script>
-	// --- INICIO DE LA SOLUCIÓN ---
-	// Le decimos a TypeScript que confíe en que estas propiedades y funciones existirán globalmente.
+	// Le decimos a TypeScript que confíe en que gtag existirá globalmente.
 	declare global {
-		interface Window {
-			dataLayer: any[]
-		}
 		function gtag(...args: any[]): void
 	}
-	// --- FIN DE LA SOLUCIÓN ---
 
-	// Función para cargar los scripts de seguimiento
-	function activateTracking() {
-		const gaId = 'G-L3RENW6576' // Tu ID real
-
-		if (document.querySelector(`script[src*="${gaId}"]`)) {
-			console.log('Google Analytics ya está cargado.')
-			return
-		}
-
-		const script = document.createElement('script')
-		script.async = true
-		script.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`
-
-		document.head.appendChild(script)
-
-		// Ahora TypeScript ya sabe qué es window.dataLayer y no dará error
-		window.dataLayer = window.dataLayer || []
-
-		// Ahora TypeScript ya sabe qué es la función gtag y no dará error
-		function gtag(...args: any[]) {
-			// Le damos el tipo aquí también por consistencia
-			window.dataLayer.push(arguments)
-		}
-		gtag('js', new Date())
-
-		gtag('config', gaId)
-
-		console.log(`Google Analytics activado para el ID: ${gaId}`)
-	}
-
-	// --- El resto del código del banner (no cambia) ---
 	const banner = document.getElementById('cookie-consent-banner')
 	const acceptBtn = document.getElementById('accept-cookies')
 	const rejectBtn = document.getElementById('reject-cookies')
@@ -148,23 +111,41 @@
 
 		const consent = localStorage.getItem('cookie_consent')
 
-		if (consent === 'accepted') {
-			activateTracking()
-		} else if (!consent) {
+		// Solo mostramos el banner si NO hay una decisión previa
+		if (!consent) {
 			setTimeout(() => {
 				banner.classList.add('show')
 			}, 300)
 		}
 
+		// Al ACEPTAR: enviamos el comando 'update' con el estado 'granted'
 		acceptBtn.addEventListener('click', () => {
+			gtag('consent', 'update', {
+				ad_storage: 'granted',
+				analytics_storage: 'granted',
+				ad_user_data: 'granted',
+				ad_personalization: 'granted'
+			})
+
 			localStorage.setItem('cookie_consent', 'accepted')
 			hideBanner()
-			activateTracking()
+			console.log('Consentimiento actualizado a ACEPTADO.')
 		})
 
+		// Al RECHAZAR: el estado ya es 'denied' por defecto, solo guardamos la decisión
 		rejectBtn.addEventListener('click', () => {
+			// Técnicamente no es necesario enviar un 'update' con 'denied',
+			// porque ya es el estado por defecto, pero es una buena práctica.
+			gtag('consent', 'update', {
+				ad_storage: 'denied',
+				analytics_storage: 'denied',
+				ad_user_data: 'denied',
+				ad_personalization: 'denied'
+			})
+
 			localStorage.setItem('cookie_consent', 'rejected')
 			hideBanner()
+			console.log('Consentimiento actualizado a RECHAZADO.')
 		})
 	}
 </script>

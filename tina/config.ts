@@ -1,13 +1,12 @@
 import { CATEGORIES } from '../src/data/categories.ts'
 import { defineConfig } from 'tinacms'
 
-// Your hosting provider likely exposes this as an environment variable
 const branch = process.env.HEAD || process.env.VERCEL_GIT_COMMIT_REF || 'main'
 
 export default defineConfig({
 	branch,
-	clientId: null, // Get this from tina.io
-	token: null, // Get this from tina.io
+	clientId: null,
+	token: null,
 
 	build: {
 		outputFolder: 'admin',
@@ -30,11 +29,11 @@ export default defineConfig({
 					{
 						type: 'image',
 						label: 'Cover Image',
-						required: true,
+						// CAMBIO: La imagen de portada ya no es obligatoria
+						required: false,
 						name: 'heroImage',
 						description: 'The image used for the cover of the post'
 					},
-
 					{
 						type: 'string',
 						required: true,
@@ -63,9 +62,20 @@ export default defineConfig({
 						description: 'If this is checked the post will not be published'
 					},
 					{
+						type: 'boolean',
+						name: 'listed',
+						label: 'Mostrar en la lista del blog?',
+						description:
+							'Desactívalo para páginas legales (Aviso Legal, etc.) que no deben aparecer en el feed.',
+						ui: {
+							defaultValue: true
+						}
+					},
+					{
 						type: 'string',
 						name: 'tags',
-						required: true,
+						// CAMBIO: Las etiquetas ya no son obligatorias
+						required: false,
 						label: 'Tags',
 						description: 'Tags for this post',
 						list: true,
@@ -86,7 +96,6 @@ export default defineConfig({
 						name: 'SButton',
 						isBody: true,
 						templates: [
-							// Custom Components
 							{
 								label: 'SButton',
 								name: 'SButton',

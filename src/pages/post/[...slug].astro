@@ -5,16 +5,17 @@ import Code from '@/components/mdx/Code'
 import ListRelatedPosts from '@/components/ListRelatedPosts'
 import Share from '@/components/Share'
 import TableOfContents from '@/components/TableOfContents'
-import { getPosts } from '@/utils'
+// Eliminamos getPosts de utils, ya no es necesario aquí
 import SButton from '@/components/mdx/SButton'
 import Disqus from '@/components/Disqus'
 import { disqusConfig } from '@/data/disqus.config'
 
-const posts = await getCollection('blog')
 export async function getStaticPaths() {
-	const posts = await getPosts()
+	// CORRECCIÓN 1: Para generar las páginas, necesitamos TODAS las que no sean borradores.
+	// No podemos usar getPosts() de utils porque filtraría las páginas legales.
+	const postsToBuild = (await getCollection('blog')).filter((post) => !post.data.draft)
 
-	return posts.map((post) => ({
+	return postsToBuild.map((post) => ({
 		params: { slug: post.slug },
 		props: post
 	}))
@@ -23,18 +24,43 @@ type Props = CollectionEntry<'blog'>
 
 const post = Astro.props
 const MAX_POSTS = 3
-const getRelatedPosts = (post: Props) => {
-	const lowercaseTags = post.data.tags.map((tag) => tag.toLowerCase())
-	const relatedPosts = posts.filter(
-		(p) => p.slug !== post.slug && p.data.tags.some((t) => lowercaseTags.includes(t.toLowerCase()))
-	)
+
+// CORRECCIÓN 2: Obtenemos la lista de posts contra la que comparar.
+// Esta lista SÍ debe estar filtrada para no mostrar posts no listados como relacionados.
+const allPublicPosts = (await getCollection('blog')).filter(
+	(p) => p.data.listed !== false && !p.data.draft
+)
+
+// CORRECCIÓN 3: Hacemos la función getRelatedPosts robusta
+const getRelatedPosts = (currentPost: Props) => {
+	// ¡SOLUCIÓN PRINCIPAL! Si el post actual no tiene tags, no hay nada que hacer.
+	if (!currentPost.data.tags || currentPost.data.tags.length === 0) {
+		return [] // Devuelve un array vacío
+	}
+
+	const lowercaseTags = currentPost.data.tags.map((tag) => tag.toLowerCase())
+
+	const relatedPosts = allPublicPosts.filter((otherPost) => {
+		// No incluir el post actual en la lista de relacionados
+		if (otherPost.slug === currentPost.slug) {
+			return false
+		}
+
+		// Comprobar que el otro post también tenga tags antes de compararlos
+		if (!otherPost.data.tags) {
+			return false
+		}
+
+		// Devuelve true si alguna de las etiquetas del otro post coincide
+		return otherPost.data.tags.some((tag) => lowercaseTags.includes(tag.toLowerCase()))
+	})
+
 	return relatedPosts.slice(0, MAX_POSTS)
 }
 
 const relatedPosts = getRelatedPosts(post)
 
 const { Content, headings, remarkPluginFrontmatter } = await post.render()
-
 const disqusEnabled = disqusConfig.enabled
 ---
 
@@ -45,7 +71,7 @@ const disqusEnabled = disqusConfig.enabled
 	readTime={remarkPluginFrontmatter.minutesRead}
 >
 	<div class='grid grid-cols-1 md:grid-cols-[20%_auto] gap-10 mt-8'>
-		<!-- aside  -->
+		<!-- ... el resto de tu HTML no cambia ... -->
 		<aside class='md:flex flex-col gap-8 hidden'>
 			<Share />
 			<div class='sticky top-24 self-start hidden md:block transition-all duration-200'>
@@ -53,17 +79,20 @@ const disqusEnabled = disqusConfig.enabled
 			</div>
 		</aside>
 
-		<!-- post -->
 		<article class='max-w-full w-full'>
 			<div class='prose prose-lg md:prose-xl dark:prose-invert mb-12 min-w-full'>
 				<Content components={{ pre: Code, SButton }} />
 			</div>
 
-			<!-- related posts -->
-			<footer>
-				<h2 class='font-bold text-lg dark:text-white mb-6'>Related Posts</h2>
-				<ListRelatedPosts posts={relatedPosts} />
-			</footer>
+			<!-- CORRECCIÓN 4: Solo mostrar "Related Posts" si realmente hay alguno -->
+			{
+				relatedPosts.length > 0 && (
+					<footer>
+						<h2 class='font-bold text-lg dark:text-white mb-6'>Related Posts</h2>
+						<ListRelatedPosts posts={relatedPosts} />
+					</footer>
+				)
+			}
 		</article>
 	</div>
 

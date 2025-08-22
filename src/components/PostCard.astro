@@ -12,28 +12,52 @@ const {
 ---
 
 <article class='grid grid-rows-[300px_auto] md:grid-rows-[300px_220px] min-h-full group'>
-	<a class='relative overflow-hidden' href={`/post/${slug}/`}>
-		<Image
-			src={heroImage}
-			width={600}
-			height={200}
-			format='webp'
-			class='h-full min-w-full object-cover hover:scale-[101%] transition-all duration-200 rounded-[2px]'
-			alt={`img of ${title}`}
-		/>
+	{/* ========================================================== */}
+	{/* ============== INICIO DE LA SOLUCIÓN ====================== */}
+	{/* ========================================================== */}
 
-		<div class='z-30 absolute bottom-0 w-full h-20'>
-			<div class='-z-10 absolute bottom-0 glass w-full min-h-full'></div>
-			<div class='flex items-center justify-between gap-x-1 text-white px-6 py-4'>
-				<div class='flex flex-col gap-1 items-center justify-center'>
-					<FormattedDate date={pubDate} />
-					<span class='text-sm'> {readTime}</span>
+	{
+		/* Usamos una condición ternaria: si 'heroImage' existe, muestra el bloque de imagen. Si no, muestra el bloque de reemplazo. */
+	}
+	{
+		heroImage ? (
+			// ESTE ES EL BLOQUE QUE SE MUESTRA SI HAY IMAGEN (tu código original)
+			<a class='relative overflow-hidden' href={`/post/${slug}/`}>
+				<Image
+					src={heroImage}
+					width={600}
+					height={200}
+					format='webp'
+					class='h-full min-w-full object-cover hover:scale-[101%] transition-all duration-200 rounded-[2px]'
+					alt={`img of ${title}`}
+				/>
+
+				<div class='z-30 absolute bottom-0 w-full h-20'>
+					<div class='-z-10 absolute bottom-0 glass w-full min-h-full' />
+					<div class='flex items-center justify-between gap-x-1 text-white px-6 py-4'>
+						<div class='flex flex-col gap-1 items-center justify-center'>
+							<FormattedDate date={pubDate} />
+							<span class='text-sm'> {readTime}</span>
+						</div>
+
+						<span class='pb-4'>{category}</span>
+					</div>
 				</div>
+			</a>
+		) : (
+			// ESTE ES EL BLOQUE "ELSE" QUE SE MUESTRA SI NO HAY IMAGEN
+			<a
+				href={`/post/${slug}/`}
+				class='flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800 rounded-[2px] p-4 text-center'
+			>
+				<span class='text-gray-500 dark:text-gray-400 font-semibold text-lg'>{category}</span>
+			</a>
+		)
+	}
 
-				<span class='pb-4'>{category}</span>
-			</div>
-		</div>
-	</a>
+	{/* ========================================================== */}
+	{/* ================= FIN DE LA SOLUCIÓN ====================== */}
+	{/* ========================================================== */}
 
 	<div class='flex justify-between flex-col gap-4 md:gap-0 py-6 pl-1'>
 		<div class='flex flex-col gap-3'>
@@ -66,6 +90,7 @@ const {
 </article>
 
 <script>
+	// Tu script de animación no necesita cambios
 	import { animate } from 'motion'
 
 	const images = document.querySelectorAll('img')

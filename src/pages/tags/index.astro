@@ -3,6 +3,14 @@ import BaseLayout from '@/layouts/BaseLayout'
 import TitlePage from '@/components/TitlePage'
 import { getTags } from '@/utils'
 const tags = await getTags()
+import { getCollection } from 'astro:content'
+// ... otros imports ...
+
+const allPosts = (await getCollection('blog')).filter(
+	(post) => post.data.listed !== false && !post.data.draft
+)
+---
+
 ---
 
 <BaseLayout title='Tags'>
