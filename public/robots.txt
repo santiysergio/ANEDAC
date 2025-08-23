@@ -1,4 +1,13 @@
+
+
 User-agent: *
+
+
+Disallow: /_astro/
+
+
+
 Allow: /
 
-Sitemap: https://blog-template-gray.vercel.app/sitemap-index.xml
+
+Sitemap: https://www.anedac.es/sitemap-0.xml
