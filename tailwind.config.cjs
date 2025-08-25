@@ -10,7 +10,10 @@ module.exports = {
 				white: '#f8f9fa'
 			},
 			fontFamily: {
-				body: ['Manrope', ...defaultTheme.fontFamily.sans]
+				// Hemos renombrado 'body' a 'sans'
+				// 'sans' es el nombre de la fuente por defecto de Tailwind
+				// Ahora, todo el texto usará Manrope por defecto
+				sans: ['Manrope', ...defaultTheme.fontFamily.sans]
 			},
 			gridTemplateColumns: {
 				list: 'repeat(auto-fill, minmax(400px, max-content))'
