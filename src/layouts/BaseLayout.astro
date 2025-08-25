@@ -1,28 +1,40 @@
 ---
-// src/layouts/BaseLayout.astro
-
-// Importación SIN la extensión .astro, como solicitaste
 import CookieConsent from '@/components/CookieConsent'
-
 import BaseHead from '@/components/BaseHead'
 import Header from '@/components/Header'
 import ProviderTheme from '@/components/ProviderTheme'
 import ProviderAnimations from '@/components/ProviderAnimations'
 import TwSizeIndicator from '@/components/TwSizeIndicator'
 import EditBlog from '@/components/editBlog'
+
 const { title, description, image, articleDate } = Astro.props
+const defaultImage = '/open-graph.png'
+const imageUrl = new URL(image || defaultImage, Astro.site).href
 ---
 
 <html lang='es' class='scroll-smooth'>
 	<head>
-		{/* ... tu head no cambia ... */}
 		<BaseHead title={title} description={description} ogImage={image} articleDate={articleDate} />
+
+		<meta property='og:type' content='website' />
+		<meta property='og:url' content={Astro.url} />
+		<meta property='og:title' content={title} />
+		<meta property='og:description' content={description} />
+		<meta property='og:image' content={imageUrl} />
+		<meta property='twitter:card' content='summary_large_image' />
+		<meta property='twitter:url' content={Astro.url} />
+		<meta property='twitter:title' content={title} />
+		<meta property='twitter:description' content={description} />
+		<meta property='twitter:image' content={imageUrl} />
+
 		<ProviderTheme />
 		<ProviderAnimations />
 		<link rel='icon' href='/favicon.png' type='image/png' />
 
-		{/* ---- Configuración de Consent v2 de Google ---- */}
-		<script async src='https://www.googletagmanager.com/gtag/js?id=G-L3RENW6576'></script>
+		<script
+			type='text/partytown'
+			async
+			src={`https://www.googletagmanager.com/gtag/js?id=G-L3RENW6576`}></script>
 		<script is:inline>
 			window.dataLayer = window.dataLayer || []
 			function gtag() {
@@ -49,11 +61,7 @@ const { title, description, image, articleDate } = Astro.props
 		<TwSizeIndicator />
 		<EditBlog />
 
-		{/* ========================================================== */}
-		{/* ============ INICIO DEL FOOTER ACTUALIZADO =============== */}
-		{/* ========================================================== */}
 		<footer class='text-center py-8 text-sm text-gray-500 dark:text-gray-400'>
-			<!-- DIV PARA LOS ENLACES LEGALES -->
 			<div class='flex justify-center items-center flex-wrap gap-x-6 gap-y-2 mb-4'>
 				<a href='/post/aviso-legal/' class='underline hover:text-gray-800 dark:hover:text-gray-200'
 					>Aviso Legal</a
@@ -68,10 +76,8 @@ const { title, description, image, articleDate } = Astro.props
 				>
 			</div>
 
-			<!-- COPYRIGHT -->
 			<p>&copy; {new Date().getFullYear()} ANEDAC. Todos los derechos reservados.</p>
 
-			<!-- GESTIÓN DE COOKIES -->
 			<div class='mt-2'>
 				<a
 					href='#'
@@ -82,9 +88,6 @@ const { title, description, image, articleDate } = Astro.props
 				</a>
 			</div>
 		</footer>
-		{/* ========================================================== */}
-		{/* ============== FIN DEL FOOTER ACTUALIZADO ================ */}
-		{/* ========================================================== */}
 
 		<CookieConsent client:load />
 
@@ -106,7 +109,7 @@ const { title, description, image, articleDate } = Astro.props
 
 		<style>
 			body {
-				margin-left: calc(100vw - 100%); /* prevent layout shift */
+				margin-left: calc(100vw - 100%);
 			}
 		</style>
 	</body>

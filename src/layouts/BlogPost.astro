@@ -14,7 +14,7 @@ type Props = {
 }
 
 const { data, readTime, headings, id } = Astro.props
-const { title, description, pubDate, heroImage, tags } = data // 'tags' puede ser undefined aquí
+const { title, description, pubDate, heroImage, tags } = data
 
 const articleDate = pubDate.toISOString()
 ---
@@ -41,11 +41,6 @@ const articleDate = pubDate.toISOString()
 				</h1>
 			</div>
 
-			{/* ========================================================== */}
-			{/* ============== INICIO DE LA SOLUCIÓN ====================== */}
-			{/* ========================================================== */}
-
-			{/* Solo mostramos el div de etiquetas si 'tags' existe y tiene elementos */}
 			{
 				tags && tags.length > 0 && (
 					<div class='flex flex-wrap justify-center items-center gap-2 gap-y-4 md:gap-5'>
@@ -55,10 +50,6 @@ const articleDate = pubDate.toISOString()
 					</div>
 				)
 			}
-
-			{/* ========================================================== */}
-			{/* ================= FIN DE LA SOLUCIÓN ====================== */}
-			{/* ========================================================== */}
 		</header>
 
 		<>
@@ -71,6 +62,7 @@ const articleDate = pubDate.toISOString()
 						quality={100}
 						format='jpg'
 						loading='eager'
+						fetchpriority='high'
 						class='rounded-md w-full max-h-[300px]  md:max-h-[500px] my-8 object-cover'
 						alt={`img of ${title}`}
 					/>
@@ -97,7 +89,7 @@ const articleDate = pubDate.toISOString()
 				const index = document.querySelector(`aside a[href="#${entry.target.id}"]`)
 
 				if (entry.isIntersecting) {
-					index?.classList.remove('bg-slate-200', 'dark:bg-slate-800') // remove bg
+					index?.classList.remove('bg-slate-200', 'dark:bg-slate-800')
 					index?.classList.add(
 						'bg-indigo-600',
 						'dark:bg-indigo-700',
@@ -107,7 +99,7 @@ const articleDate = pubDate.toISOString()
 						'duration-200'
 					)
 				} else {
-					index?.classList.add('bg-slate-200', 'dark:bg-slate-800') // add bg
+					index?.classList.add('bg-slate-200', 'dark:bg-slate-800')
 					index?.classList.remove(
 						'bg-indigo-600',
 						'dark:bg-indigo-700',
