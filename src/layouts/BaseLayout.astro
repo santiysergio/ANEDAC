@@ -6,7 +6,7 @@ import ProviderTheme from '@/components/ProviderTheme'
 import ProviderAnimations from '@/components/ProviderAnimations'
 import TwSizeIndicator from '@/components/TwSizeIndicator'
 import EditBlog from '@/components/editBlog'
-
+import '../styles/fonts.css'
 const { title, description, image, articleDate } = Astro.props
 const defaultImage = '/open-graph.png'
 const imageUrl = new URL(image || defaultImage, Astro.site).href

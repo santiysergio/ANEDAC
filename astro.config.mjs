@@ -5,7 +5,6 @@ import sitemap from '@astrojs/sitemap';
 import tailwind from '@astrojs/tailwind';
 import partytown from "@astrojs/partytown";
 import critters from "astro-critters";
-import font from "astro-font";
 
 import { remarkReadingTime } from './src/utils/readTime.ts';
 
@@ -36,36 +35,5 @@ export default defineConfig({
     tailwind(),
     partytown(),
     critters(),
-    font({
-      config: [
-        {
-          name: 'Manrope',
-          src: [
-            {
-              path: 'public/fonts/Manrope-Regular.woff2',
-              weight: '400',
-              style: 'normal',
-            },
-            {
-              path: 'public/fonts/Manrope-Bold.woff2',
-              weight: '700',
-              style: 'normal',
-            },
-          ],
-          preload: true,
-          display: 'swap',
-          fallback: 'sans-serif',
-        },
-      ],
-    }),
   ],
-
-  // ========================================================== //
-  // =================== AÑADE ESTA SECCIÓN =================== //
-  // ========================================================== //
-  vite: {
-    ssr: {
-      noExternal: ['astro-font']
-    }
-  }
 });
