@@ -30,23 +30,27 @@ const imageUrl = new URL(image || defaultImage, Astro.site).href
 		<ProviderTheme />
 		<ProviderAnimations />
 		<link rel='icon' href='/favicon.png' type='image/png' />
+		<!-- En src/layouts/BaseLayout.astro, dentro del <head> -->
+		<!-- Google tag (gtag.js) -->
+		<script async src='https://www.googletagmanager.com/gtag/js?id=G-L3RENW6576'></script>
+		<script>
+			// --- INICIO DE LA SOLUCIÓN: DECLARACIONES TYPESCRIPT ---
+			declare global {
+				interface Window {
+					dataLayer: any[]
+					// ¡CORRECCIÓN! gtaga también debe ser una propiedad de Window
+					gtag: (...args: any[]) => void
+				}
+			}
+			// --- FIN DE LA SOLUCIÓN ---
 
-		<script
-			type='text/partytown'
-			async
-			src={`https://www.googletagmanager.com/gtag/js?id=G-L3RENW6576`}></script>
-		<script is:inline>
 			window.dataLayer = window.dataLayer || []
-			function gtag() {
-				dataLayer.push(arguments)
+			// Aquí la definimos, pero TypeScript ya sabe que existirá en window.
+			function gtag(...args: any[]) {
+				window.dataLayer.push(args)
 			}
 			gtag('js', new Date())
-			gtag('consent', 'default', {
-				ad_storage: 'denied',
-				analytics_storage: 'denied',
-				ad_user_data: 'denied',
-				ad_personalization: 'denied'
-			})
+
 			gtag('config', 'G-L3RENW6576')
 		</script>
 	</head>
