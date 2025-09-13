@@ -1,5 +1,4 @@
 ---
-import CookieConsent from '@/components/CookieConsent'
 import BaseHead from '@/components/BaseHead'
 import Header from '@/components/Header'
 import ProviderTheme from '@/components/ProviderTheme'
@@ -7,6 +6,7 @@ import ProviderAnimations from '@/components/ProviderAnimations'
 import TwSizeIndicator from '@/components/TwSizeIndicator'
 import EditBlog from '@/components/editBlog'
 import '../styles/fonts.css'
+
 const { title, description, image, articleDate } = Astro.props
 const defaultImage = '/open-graph.png'
 const imageUrl = new URL(image || defaultImage, Astro.site).href
@@ -30,28 +30,66 @@ const imageUrl = new URL(image || defaultImage, Astro.site).href
 		<ProviderTheme />
 		<ProviderAnimations />
 		<link rel='icon' href='/favicon.png' type='image/png' />
-		<!-- En src/layouts/BaseLayout.astro, dentro del <head> -->
-		<!-- Google tag (gtag.js) -->
-		<script async src='https://www.googletagmanager.com/gtag/js?id=G-L3RENW6576'></script>
-		<script>
-			// --- INICIO DE LA SOLUCIÓN: DECLARACIONES TYPESCRIPT ---
-			declare global {
-				interface Window {
-					dataLayer: any[]
-					// ¡CORRECCIÓN! gtaga también debe ser una propiedad de Window
-					gtag: (...args: any[]) => void
-				}
-			}
-			// --- FIN DE LA SOLUCIÓN ---
 
+		<!-- Bloque de Google Analytics y Lógica de Consentimiento -->
+		<script async src={`https://www.googletagmanager.com/gtag/js?id=G-L3RENW6576`}></script>
+		<script is:inline>
 			window.dataLayer = window.dataLayer || []
-			// Aquí la definimos, pero TypeScript ya sabe que existirá en window.
-			function gtag(...args: any[]) {
-				window.dataLayer.push(args)
+			function gtag() {
+				dataLayer.push(arguments)
 			}
 			gtag('js', new Date())
 
+			gtag('consent', 'default', {
+				ad_storage: 'denied',
+				analytics_storage: 'denied',
+				ad_user_data: 'denied',
+				ad_personalization: 'denied'
+			})
+
 			gtag('config', 'G-L3RENW6576')
+
+			document.addEventListener('DOMContentLoaded', () => {
+				const banner = document.getElementById('cookie-consent-banner')
+				const acceptBtn = document.getElementById('accept-cookies')
+				const rejectBtn = document.getElementById('reject-cookies')
+				const manageBtn = document.getElementById('manage-cookies-btn')
+
+				if (banner && acceptBtn && rejectBtn) {
+					const showBanner = () => {
+						banner.style.display = 'flex'
+						setTimeout(() => (banner.style.transform = 'translateY(0)'), 10)
+					}
+					const hideBanner = () => (banner.style.transform = 'translateY(100%)')
+
+					const consent = localStorage.getItem('cookie_consent')
+					if (!consent) {
+						showBanner()
+					}
+
+					acceptBtn.addEventListener('click', () => {
+						gtag('consent', 'update', {
+							analytics_storage: 'granted',
+							ad_storage: 'granted'
+						})
+						localStorage.setItem('cookie_consent', 'accepted')
+						hideBanner()
+					})
+
+					rejectBtn.addEventListener('click', () => {
+						localStorage.setItem('cookie_consent', 'rejected')
+						hideBanner()
+					})
+
+					if (manageBtn) {
+						manageBtn.addEventListener('click', (event) => {
+							event.preventDefault()
+							localStorage.removeItem('cookie_consent')
+							showBanner()
+						})
+					}
+				}
+			})
 		</script>
 	</head>
 
@@ -79,9 +117,7 @@ const imageUrl = new URL(image || defaultImage, Astro.site).href
 					class='underline hover:text-gray-800 dark:hover:text-gray-200'>Política de Cookies</a
 				>
 			</div>
-
 			<p>&copy; {new Date().getFullYear()} ANEDAC. Todos los derechos reservados.</p>
-
 			<div class='mt-2'>
 				<a
 					href='#'
@@ -93,27 +129,45 @@ const imageUrl = new URL(image || defaultImage, Astro.site).href
 			</div>
 		</footer>
 
-		<CookieConsent client:load />
+		<!-- HTML del Banner de Cookies -->
+		<div
+			id='cookie-consent-banner'
+			style='display: none; position: fixed; bottom: 0; left: 0; width: 100%; background-color: #2c3e50; color: #ecf0f1; padding: 20px; box-shadow: 0 -2px 10px rgba(0,0,0,0.2); justify-content: space-between; align-items: center; z-index: 1000; transition: transform 0.4s ease-out; transform: translateY(100%);'
+		>
+			<p style='margin: 0; font-size: 14px; flex-grow: 1;'>
+				Utilizamos cookies para mejorar tu experiencia. Al continuar, aceptas nuestro uso de
+				cookies.
+				<a href='/post/poltica-de-cookies/' style='color: #3498db; text-decoration: underline;'
+					>Más información</a
+				>.
+			</p>
+			<div style='display: flex; gap: 10px; margin-left: 20px;'>
+				<button
+					id='accept-cookies'
+					style='padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; background-color: #27ae60; color: white;'
+					>Aceptar</button
+				>
+				<button
+					id='reject-cookies'
+					style='padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; background-color: #7f8c8d; color: white;'
+					>Rechazar</button
+				>
+			</div>
+		</div>
 
-		<script>
-			const manageCookiesBtn = document.getElementById('manage-cookies-btn')
-			if (manageCookiesBtn) {
-				manageCookiesBtn.addEventListener('click', (event) => {
-					event.preventDefault()
-					localStorage.removeItem('cookie_consent')
-					const banner = document.getElementById('cookie-consent-banner')
-					if (banner) {
-						banner.classList.add('show')
-					} else {
-						location.reload()
-					}
-				})
-			}
-		</script>
-
-		<style>
-			body {
-				margin-left: calc(100vw - 100%);
+		<style is:global>
+			/* Pequeño CSS global para la responsividad del banner en móvil */
+			@media (max-width: 768px) {
+				#cookie-consent-banner {
+					flex-direction: column;
+					text-align: center;
+				}
+				#cookie-consent-banner > div {
+					margin-left: 0;
+					margin-top: 15px;
+					width: 100%;
+					justify-content: center;
+				}
 			}
 		</style>
 	</body>
