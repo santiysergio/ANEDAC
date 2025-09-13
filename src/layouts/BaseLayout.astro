@@ -34,12 +34,15 @@ const imageUrl = new URL(image || defaultImage, Astro.site).href
 		<!-- Bloque de Google Analytics y Lógica de Consentimiento -->
 		<script async src={`https://www.googletagmanager.com/gtag/js?id=G-L3RENW6576`}></script>
 		<script is:inline>
+			// Configuración básica de Google Analytics
 			window.dataLayer = window.dataLayer || []
 			function gtag() {
+				// ¡LA CORRECCIÓN ESTÁ AQUÍ! Usamos 'arguments' directamente.
 				dataLayer.push(arguments)
 			}
 			gtag('js', new Date())
 
+			// Establecer el Modo de Consentimiento por defecto a 'denied'
 			gtag('consent', 'default', {
 				ad_storage: 'denied',
 				analytics_storage: 'denied',
@@ -47,8 +50,10 @@ const imageUrl = new URL(image || defaultImage, Astro.site).href
 				ad_personalization: 'denied'
 			})
 
+			// Configuración inicial de tu ID de GA
 			gtag('config', 'G-L3RENW6576')
 
+			// Lógica del banner de cookies
 			document.addEventListener('DOMContentLoaded', () => {
 				const banner = document.getElementById('cookie-consent-banner')
 				const acceptBtn = document.getElementById('accept-cookies')
