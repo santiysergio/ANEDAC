@@ -10,7 +10,13 @@ type TableOfContent = {
 	subheadings: TableOfContent[]
 }
 
-const toc = buildToc(headings)
+// ✅ LA CORRECCIÓN EMPIEZA AQUÍ
+// 1. Comprobamos si existen encabezados antes de hacer nada.
+const hasHeadings = headings && headings.length > 0
+
+// 2. Solo construimos la tabla de contenidos si hay encabezados.
+const toc = hasHeadings ? buildToc(headings) : []
+
 function buildToc(headings: TableOfContent[]) {
 	let toc: TableOfContent[] = []
 	let parentHeadings = new Map()
@@ -21,16 +27,25 @@ function buildToc(headings: TableOfContent[]) {
 		if (heading.depth === 1 || heading.depth === 2) {
 			toc.push(heading)
 		} else {
-			parentHeadings.get(heading.depth - 1).subheadings.push(heading)
+			// Se añade una comprobación para evitar el error si un H3 no tiene un H2 padre
+			if (parentHeadings.has(heading.depth - 1)) {
+				parentHeadings.get(heading.depth - 1).subheadings.push(heading)
+			}
 		}
 	})
 	return toc
 }
 ---
 
-<nav class='max-w-xs dark:text-black'>
-	<p class='font-bold mb-3 text-2xl dark:text-white'>Index</p>
-	<ul class='[text-wrap:balance] flex flex-col gap-1'>
-		{toc.map((heading) => <TableOfContentsHeading heading={heading} />)}
-	</ul>
-</nav>
+<!-- 3. Solo mostramos el componente si hay encabezados. -->{
+	hasHeadings && (
+		<nav class='max-w-xs dark:text-black'>
+			<p class='font-bold mb-3 text-2xl dark:text-white'>Índice</p>
+			<ul class='[text-wrap:balance] flex flex-col gap-1'>
+				{toc.map((heading) => (
+					<TableOfContentsHeading heading={heading} />
+				))}
+			</ul>
+		</nav>
+	)
+}

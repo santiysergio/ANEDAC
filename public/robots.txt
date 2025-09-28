@@ -1,13 +1,5 @@
 
-
 User-agent: *
-
-
-Disallow: /_astro/
-
-
-
 Allow: /
 
-
-Sitemap: https://www.anedac.es/sitemap-0.xml
+Sitemap: https://anedac.es/sitemap-0.xml
